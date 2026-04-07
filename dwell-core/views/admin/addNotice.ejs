@@ -1,0 +1,54 @@
+<%- include('../partials/header', { activePage: 'notices' }) %>
+
+<div class="page-hero hero-notices">
+  <div class="hero-content">
+    <h2>Post New Notice 📢</h2>
+    <p>Broadcast an announcement to all residents</p>
+  </div>
+  <div class="hero-icon">📋</div>
+</div>
+
+<div class="card" style="max-width:600px;margin:0 auto;">
+  <div class="card-header">
+    <h5>Notice Details</h5>
+    <a href="/admin/notices" class="btn btn-outline btn-sm">← Back</a>
+  </div>
+  <div class="card-body">
+    <form action="/admin/notices/add" method="POST">
+      <div class="form-group">
+        <label class="form-label">Notice Title *</label>
+        <input type="text" name="title" class="form-control" placeholder="e.g., Water Supply Interruption on 25th" required>
+      </div>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select name="category" class="form-control">
+            <option value="General">General</option>
+            <option value="Maintenance">Maintenance</option>
+            <option value="Event">Event</option>
+            <option value="Emergency">Emergency</option>
+            <option value="Finance">Finance</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Priority</label>
+          <select name="priority" class="form-control">
+            <option value="Normal">Normal</option>
+            <option value="Important">Important</option>
+            <option value="Urgent">Urgent</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notice Content *</label>
+        <textarea name="content" class="form-control" rows="6" placeholder="Write the full notice here..." required></textarea>
+      </div>
+      <div class="d-flex gap-3" style="justify-content:flex-end;">
+        <a href="/admin/notices" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary">📢 Post Notice</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

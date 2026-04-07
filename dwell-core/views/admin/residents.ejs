@@ -1,0 +1,69 @@
+<%- include('../partials/header', { activePage: 'residents' }) %>
+
+<div class="page-hero hero-residents">
+  <div class="hero-content">
+    <h2>Residents Management 👥</h2>
+    <p>Add, view and manage all apartment residents</p>
+  </div>
+  <div class="hero-icon">👥</div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h5>All Residents (<%= residents.length %>)</h5>
+    <a href="/admin/residents/add" class="btn btn-primary btn-sm">+ Add Resident</a>
+  </div>
+  <div class="card-body" style="padding-bottom:0;">
+    <form action="/admin/residents" method="GET" class="search-bar">
+      <div class="search-input">
+        <span class="search-icon">🔍</span>
+        <input type="text" name="search" class="form-control" placeholder="Search by flat number..." value="<%= search %>">
+      </div>
+      <button type="submit" class="btn btn-primary">Search</button>
+      <% if (search) { %><a href="/admin/residents" class="btn btn-outline">Clear</a><% } %>
+    </form>
+  </div>
+
+  <% if (residents.length === 0) { %>
+    <div class="empty-state"><div class="empty-icon">👥</div><h5>No residents found</h5><p>Add your first resident to get started.</p></div>
+  <% } else { %>
+  <div class="table-responsive">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>#</th><th>Name</th><th>Email</th><th>Flat No</th><th>Floor</th><th>Family</th><th>Phone</th><th>Joined</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% residents.forEach((r, i) => { %>
+        <tr>
+          <td class="text-muted"><%= i+1 %></td>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6C63FF,#a78bfa);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;"><%= r.name.charAt(0).toUpperCase() %></div>
+              <strong><%= r.name %></strong>
+            </div>
+          </td>
+          <td class="text-muted"><%= r.email %></td>
+          <td><span class="badge badge-general"><%= r.flatNo || 'N/A' %></span></td>
+          <td><%= r.floor || 'N/A' %></td>
+          <td>👨‍👩‍👧 <%= r.familyMembers %></td>
+          <td><%= r.phone || 'N/A' %></td>
+          <td class="text-muted text-sm"><%= new Date(r.createdAt).toLocaleDateString() %></td>
+          <td>
+            <div class="d-flex gap-2">
+              <a href="/admin/residents/<%= r._id %>" class="btn btn-info btn-sm btn-icon" title="View">👁️</a>
+              <form action="/admin/residents/<%= r._id %>?_method=DELETE" method="POST" style="display:inline;">
+                <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete" onclick="return confirm('Delete <%= r.name %>?')">🗑️</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>

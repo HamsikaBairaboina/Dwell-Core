@@ -1,0 +1,40 @@
+<%- include('./partials/header', { activePage: 'notices' }) %>
+
+<div class="page-hero hero-notices">
+  <div class="hero-content">
+    <h2>Notice Board 📋</h2>
+    <p>Stay updated with the latest announcements from management</p>
+  </div>
+  <div class="hero-icon">📢</div>
+</div>
+
+<% if (notices.length === 0) { %>
+  <div class="card">
+    <div class="empty-state">
+      <div class="empty-icon">📋</div>
+      <h5>No notices posted yet</h5>
+      <p>Check back later for announcements.</p>
+    </div>
+  </div>
+<% } else { %>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px;">
+    <% notices.forEach(n => { %>
+    <div class="notice-card <%= n.priority.toLowerCase() %>" style="margin-bottom:0;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px;">
+        <div class="notice-title"><%= n.title %></div>
+        <span class="badge badge-<%= n.priority.toLowerCase() %>"><%= n.priority %></span>
+      </div>
+      <div class="notice-meta">
+        <span class="badge badge-<%= n.category.toLowerCase() %>"><%= n.category %></span>
+        &nbsp;•&nbsp;
+        <%= new Date(n.createdAt).toLocaleDateString('en-IN', {day:'numeric',month:'long',year:'numeric'}) %>
+        &nbsp;•&nbsp;
+        <small><%= new Date(n.createdAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) %></small>
+      </div>
+      <div class="notice-body"><%= n.content %></div>
+    </div>
+    <% }) %>
+  </div>
+<% } %>
+
+<%- include('./partials/footer') %>

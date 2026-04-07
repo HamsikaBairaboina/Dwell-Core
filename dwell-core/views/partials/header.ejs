@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">🏢</div>
+      <div class="brand-text">
+        <h5>Dwell Core</h5>
+        <small>Smart Living</small>
+      </div>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="user-avatar"><%= user ? user.name.charAt(0).toUpperCase() : 'U' %></div>
+      <div class="user-info">
+        <div class="name"><%= user ? user.name : 'Guest' %></div>
+        <span class="role-badge role-<%= role %>"><%= role === 'admin' ? '👑 Admin' : '🏠 Resident' %></span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Main</div>
+      <a href="/dashboard" class="<%= typeof activePage !== 'undefined' && activePage === 'dashboard' ? 'active' : '' %>">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+
+      <% if (role === 'admin') { %>
+        <div class="nav-section-title">Management</div>
+        <a href="/admin/residents" class="<%= typeof activePage !== 'undefined' && activePage === 'residents' ? 'active' : '' %>">
+          <span class="nav-icon">👥</span> Residents
+        </a>
+        <a href="/admin/complaints" class="<%= typeof activePage !== 'undefined' && activePage === 'complaints' ? 'active' : '' %>">
+          <span class="nav-icon">📢</span> Complaints
+        </a>
+        <a href="/admin/bills" class="<%= typeof activePage !== 'undefined' && activePage === 'bills' ? 'active' : '' %>">
+          <span class="nav-icon">💰</span> Bills
+        </a>
+        <a href="/admin/payments" class="<%= typeof activePage !== 'undefined' && activePage === 'payments' ? 'active' : '' %>">
+          <span class="nav-icon">✅</span> Payments
+        </a>
+        <a href="/admin/notices" class="<%= typeof activePage !== 'undefined' && activePage === 'notices' ? 'active' : '' %>">
+          <span class="nav-icon">📋</span> Notices
+        </a>
+      <% } else { %>
+        <div class="nav-section-title">My Space</div>
+        <a href="/complaints" class="<%= typeof activePage !== 'undefined' && activePage === 'complaints' ? 'active' : '' %>">
+          <span class="nav-icon">🛠️</span> My Complaints
+        </a>
+        <a href="/bills" class="<%= typeof activePage !== 'undefined' && activePage === 'bills' ? 'active' : '' %>">
+          <span class="nav-icon">💡</span> My Bills
+        </a>
+        <a href="/payments" class="<%= typeof activePage !== 'undefined' && activePage === 'payments' ? 'active' : '' %>">
+          <span class="nav-icon">💳</span> Payments
+        </a>
+        <a href="/notices" class="<%= typeof activePage !== 'undefined' && activePage === 'notices' ? 'active' : '' %>">
+          <span class="nav-icon">📋</span> Notice Board
+        </a>
+      <% } %>
+
+      <div class="nav-section-title">Account</div>
+      <a href="/notifications" class="<%= typeof activePage !== 'undefined' && activePage === 'notifications' ? 'active' : '' %>">
+        <span class="nav-icon">🔔</span> Notifications
+        <% if (unreadCount > 0) { %><span class="badge-notif"><%= unreadCount %></span><% } %>
+      </a>
+      <a href="/profile" class="<%= typeof activePage !== 'undefined' && activePage === 'profile' ? 'active' : '' %>">
+        <span class="nav-icon">👤</span> Profile
+      </a>
+      <a href="/auth/logout">
+        <span class="nav-icon">🚪</span> Logout
+      </a>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <!-- TOP NAV -->
+    <header class="topnav">
+      <div class="d-flex align-center gap-3">
+        <button class="btn btn-outline btn-icon" id="sidebarToggle" style="display:none">
+          <i class="fas fa-bars"></i>
+        </button>
+        <span class="page-title"><%= title.split(' - ')[0] %></span>
+      </div>
+      <div class="topnav-right">
+        <a href="/notifications" class="notif-btn" title="Notifications">
+          <i class="fas fa-bell"></i>
+          <% if (unreadCount > 0) { %><span class="notif-dot"></span><% } %>
+        </a>
+        <a href="/profile" class="topnav-user" style="text-decoration:none">
+          <div class="avatar"><%= user ? user.name.charAt(0).toUpperCase() : 'U' %></div>
+          <span class="uname" style="display:none" id="unameDesktop"><%= user ? user.name.split(' ')[0] : '' %></span>
+        </a>
+      </div>
+    </header>
+
+    <!-- PAGE CONTENT -->
+    <main class="page-content">
+      <!-- Flash Messages -->
+      <% if (success && success.length > 0) { %>
+        <div class="alert alert-success">✅ <%= success[0] %></div>
+      <% } %>
+      <% if (error && error.length > 0) { %>
+        <div class="alert alert-error">❌ <%= error[0] %></div>
+      <% } %>

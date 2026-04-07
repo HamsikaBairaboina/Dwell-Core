@@ -1,0 +1,155 @@
+<%- include('./partials/header', { activePage: 'profile' }) %>
+
+<div class="page-hero <%= user.role === 'admin' ? '' : 'hero-profile' %>" style="<%= user.role === 'admin' ? 'background:linear-gradient(135deg,#1A1A2E 0%,#0F3460 100%)' : '' %>">
+  <div class="hero-content">
+    <h2><%= user.role === 'admin' ? '👑 Admin Profile' : '👤 My Profile' %></h2>
+    <p><%= user.role === 'admin' ? 'Manage your administrator account and system settings' : 'Manage your personal information and account settings' %></p>
+  </div>
+  <div class="hero-icon"><%= user.role === 'admin' ? '👑' : '⚙️' %></div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:960px;margin:0 auto;">
+
+  <!-- ===== LEFT CARD: Profile Info ===== -->
+  <div class="card mb-0">
+    <div class="card-header">
+      <h5>Personal Information</h5>
+      <% if(user.role === 'admin') { %>
+        <span class="badge badge-admin">👑 System Admin</span>
+      <% } %>
+    </div>
+    <div class="card-body">
+
+      <!-- Avatar -->
+      <div style="text-align:center;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid #eee;">
+        <div style="width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,<%= user.role==='admin' ? '#1A1A2E,#0F3460' : '#6C63FF,#a78bfa' %>);display:flex;align-items:center;justify-content:center;color:#fff;font-size:34px;font-weight:800;margin:0 auto 14px;box-shadow:0 8px 24px rgba(0,0,0,0.15);">
+          <%= user.name.charAt(0).toUpperCase() %>
+        </div>
+        <h4 style="margin:0 0 4px;color:#1A1A2E;font-size:18px;"><%= user.name %></h4>
+        <p style="color:#888;font-size:13px;margin:0 0 8px;"><%= user.email %></p>
+        <span class="badge badge-<%= user.role %>">
+          <%= user.role === 'admin' ? '👑 Administrator' : '🏠 Resident' %>
+        </span>
+      </div>
+
+      <!-- Edit Form -->
+      <form action="/profile" method="POST">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" name="name" class="form-control" value="<%= user.name %>" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input type="tel" name="phone" class="form-control" value="<%= user.phone || '' %>" placeholder="+91 9876543210">
+        </div>
+
+        <% if(user.role === 'admin') { %>
+        <!-- Admin-specific fields -->
+        <div class="form-group">
+          <label class="form-label">Office / Department</label>
+          <input type="text" name="department" class="form-control" value="<%= user.department || '' %>" placeholder="e.g., Society Management">
+        </div>
+        <% } else { %>
+        <!-- Resident-specific fields -->
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Flat Number</label>
+            <input type="text" name="flatNo" class="form-control" value="<%= user.flatNo || '' %>" placeholder="e.g., A-101">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Floor</label>
+            <input type="text" name="floor" class="form-control" value="<%= user.floor || '' %>" placeholder="e.g., 1st Floor">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Family Members</label>
+          <input type="number" name="familyMembers" class="form-control" value="<%= user.familyMembers || 1 %>" min="1">
+        </div>
+        <% } %>
+
+        <button type="submit" class="btn btn-primary w-100" style="justify-content:center;margin-top:4px;">💾 Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== RIGHT CARD: Password + Account Info ===== -->
+  <div style="display:flex;flex-direction:column;gap:20px;">
+
+    <!-- Change Password -->
+    <div class="card mb-0">
+      <div class="card-header">
+        <h5>Change Password 🔑</h5>
+      </div>
+      <div class="card-body">
+        <form action="/profile/password" method="POST">
+          <div class="form-group">
+            <label class="form-label">Current Password</label>
+            <input type="password" name="oldPassword" class="form-control" placeholder="Enter current password" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">New Password</label>
+            <input type="password" name="newPassword" class="form-control" placeholder="Min. 6 characters" required minlength="6">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirm New Password</label>
+            <input type="password" name="confirmPassword" class="form-control" placeholder="Repeat new password" required>
+          </div>
+          <button type="submit" class="btn btn-warning w-100" style="justify-content:center;">🔐 Update Password</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Account Details -->
+    <div class="card mb-0">
+      <div class="card-header">
+        <h5>Account Details 📋</h5>
+      </div>
+      <div class="card-body">
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:10px;background:#f8f8ff;border-radius:8px;">
+            <span class="text-muted">📧 Email</span>
+            <span style="font-weight:600;color:#1A1A2E;"><%= user.email %></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:10px;background:#f8f8ff;border-radius:8px;">
+            <span class="text-muted">🎭 Role</span>
+            <span class="badge badge-<%= user.role %>"><%= user.role === 'admin' ? '👑 Admin' : '🏠 Resident' %></span>
+          </div>
+          <% if(user.role === 'resident' && user.flatNo) { %>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:10px;background:#f8f8ff;border-radius:8px;">
+            <span class="text-muted">🏠 Flat</span>
+            <span style="font-weight:600;color:#1A1A2E;"><%= user.flatNo %> <%= user.floor ? '· '+user.floor : '' %></span>
+          </div>
+          <% } %>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:10px;background:#f8f8ff;border-radius:8px;">
+            <span class="text-muted">📅 Member Since</span>
+            <span style="font-weight:600;color:#1A1A2E;"><%= new Date(user.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) %></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:10px;background:#f8f8ff;border-radius:8px;">
+            <span class="text-muted">🟢 Status</span>
+            <span class="badge badge-paid">✅ Active</span>
+          </div>
+        </div>
+
+        <% if(user.role === 'admin') { %>
+        <!-- Admin Quick Links -->
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid #eee;">
+          <p style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Admin Quick Actions</p>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <a href="/admin/residents/add" class="btn btn-outline btn-sm" style="justify-content:flex-start;">👤 Add New Resident</a>
+            <a href="/admin/bills/add" class="btn btn-outline btn-sm" style="justify-content:flex-start;">💰 Generate Bill</a>
+            <a href="/admin/notices/add" class="btn btn-outline btn-sm" style="justify-content:flex-start;">📢 Post Notice</a>
+            <a href="/auth/register-admin" class="btn btn-outline btn-sm" style="justify-content:flex-start;border-color:#9B59B6;color:#9B59B6;">👑 Register New Admin</a>
+          </div>
+        </div>
+        <% } %>
+
+        <div style="margin-top:16px;">
+          <a href="/auth/logout" class="btn btn-danger w-100" style="justify-content:center;">🚪 Logout</a>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end right col -->
+</div>
+
+<%- include('./partials/footer') %>

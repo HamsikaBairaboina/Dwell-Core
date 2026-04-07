@@ -1,0 +1,67 @@
+<%- include('../partials/header', { activePage: 'bills' }) %>
+
+<div class="page-hero hero-bills">
+  <div class="hero-content">
+    <h2>Bills Management 💰</h2>
+    <p>Generate and track maintenance bills for all residents</p>
+  </div>
+  <div class="hero-icon">💡</div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h5>All Bills</h5>
+    <a href="/admin/bills/add" class="btn btn-primary btn-sm">+ Generate Bill</a>
+  </div>
+  <div class="card-body" style="padding-bottom:0;">
+    <form action="/admin/bills" method="GET" class="search-bar">
+      <div class="search-input">
+        <span class="search-icon">🔍</span>
+        <input type="text" name="search" class="form-control" placeholder="Search by flat number..." value="<%= search %>">
+      </div>
+      <select name="status" class="form-control" style="width:auto;">
+        <option value="">All Status</option>
+        <option value="Pending" <%= status==='Pending'?'selected':'' %>>⏳ Pending</option>
+        <option value="Paid" <%= status==='Paid'?'selected':'' %>>✅ Paid</option>
+      </select>
+      <button type="submit" class="btn btn-primary">Filter</button>
+      <a href="/admin/bills" class="btn btn-outline">Reset</a>
+    </form>
+  </div>
+
+  <% if (bills.length === 0) { %>
+    <div class="empty-state"><div class="empty-icon">💰</div><h5>No bills generated yet</h5><p>Click "Generate Bill" to create a new bill.</p></div>
+  <% } else { %>
+  <div class="table-responsive">
+    <table class="tbl">
+      <thead>
+        <tr><th>Flat No</th><th>Month/Year</th><th>Maintenance</th><th>Water</th><th>Power</th><th>Total</th><th>Status</th><th>Paid On</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        <% bills.forEach(b => { %>
+        <tr>
+          <td><span class="badge badge-general"><%= b.flatNo %></span></td>
+          <td><strong><%= b.month %> <%= b.year %></strong></td>
+          <td>₹<%= b.maintenance.toLocaleString() %></td>
+          <td>₹<%= b.water.toLocaleString() %></td>
+          <td>₹<%= b.power.toLocaleString() %></td>
+          <td><strong style="color:#E67E22;">₹<%= b.totalAmount.toLocaleString() %></strong></td>
+          <td>
+            <% if(b.status==='Paid') { %><span class="badge badge-paid">✅ Paid</span>
+            <% } else { %><span class="badge badge-pending">⏳ Pending</span><% } %>
+          </td>
+          <td class="text-muted text-sm"><%= b.paidAt ? new Date(b.paidAt).toLocaleDateString() : '—' %></td>
+          <td>
+            <form action="/admin/bills/<%= b._id %>?_method=DELETE" method="POST" style="display:inline;">
+              <button type="submit" class="btn btn-danger btn-sm btn-icon" onclick="return confirm('Delete this bill?')">🗑️</button>
+            </form>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,80 @@
+<%- include('../partials/header', { activePage: 'bills' }) %>
+
+<div class="page-hero hero-bills">
+  <div class="hero-content">
+    <h2>Generate New Bill 💰</h2>
+    <p>Create a maintenance bill for a resident</p>
+  </div>
+  <div class="hero-icon">📋</div>
+</div>
+
+<div class="card" style="max-width:600px; margin:0 auto;">
+  <div class="card-header">
+    <h5>Bill Details</h5>
+    <a href="/admin/bills" class="btn btn-outline btn-sm">← Back</a>
+  </div>
+  <div class="card-body">
+    <form action="/admin/bills/add" method="POST">
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label">Flat Number *</label>
+          <select name="flatNo" class="form-control" required>
+            <option value="">-- Select Flat --</option>
+            <% residents.forEach(r => { %>
+            <option value="<%= r.flatNo %>"><%= r.flatNo %> - <%= r.name %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Year *</label>
+          <select name="year" class="form-control" required>
+            <% for(let y = new Date().getFullYear(); y >= new Date().getFullYear()-2; y--) { %>
+              <option value="<%= y %>" <%= y === new Date().getFullYear() ? 'selected' : '' %>><%= y %></option>
+            <% } %>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Month *</label>
+        <select name="month" class="form-control" required>
+          <% ['January','February','March','April','May','June','July','August','September','October','November','December'].forEach(m => { %>
+            <option value="<%= m %>" <%= m === new Date().toLocaleString('default',{month:'long'}) ? 'selected' : '' %>><%= m %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="form-grid-3">
+        <div class="form-group">
+          <label class="form-label">🏠 Maintenance (₹)</label>
+          <input type="number" name="maintenance" class="form-control" placeholder="0" min="0" step="0.01" id="maintenance" oninput="calcTotal()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">💧 Water Charges (₹)</label>
+          <input type="number" name="water" class="form-control" placeholder="0" min="0" step="0.01" id="water" oninput="calcTotal()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">⚡ Power Charges (₹)</label>
+          <input type="number" name="power" class="form-control" placeholder="0" min="0" step="0.01" id="power" oninput="calcTotal()">
+        </div>
+      </div>
+      <div style="background:linear-gradient(135deg,#6C63FF,#a78bfa);border-radius:12px;padding:16px 20px;margin-bottom:20px;color:#fff;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:14px;font-weight:600;opacity:0.9;">Total Amount</span>
+        <span style="font-size:24px;font-weight:800;" id="totalDisplay">₹0</span>
+      </div>
+      <div class="d-flex gap-3" style="justify-content:flex-end;">
+        <a href="/admin/bills" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary">✅ Generate Bill</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function calcTotal() {
+  const m = parseFloat(document.getElementById('maintenance').value)||0;
+  const w = parseFloat(document.getElementById('water').value)||0;
+  const p = parseFloat(document.getElementById('power').value)||0;
+  document.getElementById('totalDisplay').textContent = '₹' + (m+w+p).toLocaleString('en-IN');
+}
+</script>
+
+<%- include('../partials/footer') %>

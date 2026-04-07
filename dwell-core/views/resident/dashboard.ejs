@@ -1,0 +1,122 @@
+<%- include('../partials/header', { activePage: 'dashboard' }) %>
+
+<div class="page-hero">
+  <div class="hero-content">
+    <h2>Welcome Home, <%= user.name.split(' ')[0] %>! 🏠</h2>
+    <p>Flat <%= user.flatNo %> &nbsp;•&nbsp; Floor: <%= user.floor || 'N/A' %> &nbsp;•&nbsp; Family: <%= user.familyMembers %> members</p>
+  </div>
+  <div class="hero-icon">🏠</div>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon purple">📢</div>
+    <div class="stat-value"><%= myComplaints.length %></div>
+    <div class="stat-label">My Complaints</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon orange">💰</div>
+    <div class="stat-value"><%= pendingCount %></div>
+    <div class="stat-label">Pending Bills</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon red">💸</div>
+    <div class="stat-value">₹<%= totalDue.toLocaleString() %></div>
+    <div class="stat-label">Total Due</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green">✅</div>
+    <div class="stat-value"><%= myPayments.length %></div>
+    <div class="stat-label">Payments Made</div>
+  </div>
+</div>
+
+<div class="charts-grid">
+  <!-- Pending Bills -->
+  <div class="card mb-0">
+    <div class="card-header">
+      <h5>💡 Pending Bills</h5>
+      <a href="/bills" class="btn btn-outline btn-sm">View All</a>
+    </div>
+    <% if (myBills.length === 0) { %>
+      <div class="empty-state"><div class="empty-icon">🎉</div><h5>No Pending Bills!</h5><p>You're all clear.</p></div>
+    <% } else { %>
+    <div class="table-responsive">
+      <table class="tbl">
+        <thead><tr><th>Month</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>
+          <% myBills.forEach(b => { %>
+          <tr>
+            <td><%= b.month %> <%= b.year %></td>
+            <td><strong>₹<%= b.totalAmount.toLocaleString() %></strong></td>
+            <td><span class="badge badge-pending">⏳ Pending</span></td>
+            <td>
+              <form action="/bills/<%= b._id %>/pay" method="POST" style="display:inline;">
+                <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Pay ₹<%= b.totalAmount %>?')">Pay Now</button>
+              </form>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <% } %>
+  </div>
+
+  <!-- Recent Notices -->
+  <div class="card mb-0">
+    <div class="card-header">
+      <h5>📋 Latest Notices</h5>
+      <a href="/notices" class="btn btn-outline btn-sm">View All</a>
+    </div>
+    <div class="card-body" style="padding:16px;">
+      <% if (notices.length === 0) { %>
+        <div class="empty-state"><div class="empty-icon">📋</div><h5>No notices</h5></div>
+      <% } %>
+      <% notices.forEach(n => { %>
+      <div class="notice-card <%= n.priority.toLowerCase() %>">
+        <div class="notice-title"><%= n.title %></div>
+        <div class="notice-meta">
+          <span class="badge badge-<%= n.priority.toLowerCase() %>"><%= n.priority %></span>
+          &nbsp;•&nbsp; <%= new Date(n.createdAt).toLocaleDateString() %>
+        </div>
+        <div class="notice-body"><%= n.content.substring(0, 80) %><%= n.content.length > 80 ? '...' : '' %></div>
+      </div>
+      <% }) %>
+    </div>
+  </div>
+</div>
+
+<!-- My Complaints -->
+<div class="card" style="margin-top:24px;">
+  <div class="card-header">
+    <h5>🛠️ My Recent Complaints</h5>
+    <a href="/complaints/new" class="btn btn-primary btn-sm"><i style="margin-right:4px">+</i>New Complaint</a>
+  </div>
+  <% if (myComplaints.length === 0) { %>
+    <div class="empty-state"><div class="empty-icon">🎉</div><h5>No complaints raised</h5><p>Everything seems fine!</p></div>
+  <% } else { %>
+  <div class="table-responsive">
+    <table class="tbl">
+      <thead><tr><th>Title</th><th>Category</th><th>Priority</th><th>Status</th><th>Date</th></tr></thead>
+      <tbody>
+        <% myComplaints.forEach(c => { %>
+        <tr>
+          <td><strong><%= c.title %></strong></td>
+          <td><%= c.category %></td>
+          <td><span class="priority-dot <%= c.priority %>"></span><%= c.priority %></td>
+          <td>
+            <% if(c.status==='Resolved') { %><span class="badge badge-resolved">✅ Resolved</span>
+            <% } else if(c.status==='In Progress') { %><span class="badge badge-progress">🔄 In Progress</span>
+            <% } else { %><span class="badge badge-pending">⏳ Pending</span><% } %>
+          </td>
+          <td class="text-muted text-sm"><%= new Date(c.createdAt).toLocaleDateString() %></td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>

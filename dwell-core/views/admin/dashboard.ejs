@@ -1,0 +1,183 @@
+<%- include('../partials/header', { activePage: 'dashboard' }) %>
+
+<div class="page-hero">
+  <div class="hero-content">
+    <h2>Admin Dashboard 👑</h2>
+    <p>Welcome back, <%= user.name %>! Here's what's happening in Dwell Core today.</p>
+  </div>
+  <div class="hero-icon">🏢</div>
+</div>
+
+<!-- STATS GRID -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon purple">👥</div>
+    <div class="stat-value"><%= totalResidents %></div>
+    <div class="stat-label">Total Residents</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon pink">📢</div>
+    <div class="stat-value"><%= totalComplaints %></div>
+    <div class="stat-label">Total Complaints</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon red">🔴</div>
+    <div class="stat-value"><%= pendingComplaints %></div>
+    <div class="stat-label">Pending Complaints</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon orange">💰</div>
+    <div class="stat-value"><%= totalBills %></div>
+    <div class="stat-label">Total Bills</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green">✅</div>
+    <div class="stat-value"><%= totalPayments %></div>
+    <div class="stat-label">Total Payments</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon blue">📈</div>
+    <div class="stat-value">₹<%= monthlyRevenue.toLocaleString() %></div>
+    <div class="stat-label">Monthly Revenue</div>
+  </div>
+</div>
+
+<!-- CHARTS -->
+<div class="charts-grid">
+  <div class="card mb-0">
+    <div class="card-header">
+      <h5>📈 Revenue (Last 6 Months)</h5>
+    </div>
+    <div class="card-body">
+      <canvas id="revenueChart" height="110"></canvas>
+    </div>
+  </div>
+  <div class="card mb-0">
+    <div class="card-header">
+      <h5>🥧 Complaint Status</h5>
+    </div>
+    <div class="card-body" style="display:flex;align-items:center;justify-content:center;">
+      <canvas id="complaintChart" height="200" style="max-width:200px;"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="charts-grid-3" style="margin-top:24px;">
+  <div class="card mb-0">
+    <div class="card-header">
+      <h5>💰 Bills Overview</h5>
+    </div>
+    <div class="card-body" style="display:flex;align-items:center;justify-content:center;">
+      <canvas id="billChart" height="200" style="max-width:200px;"></canvas>
+    </div>
+  </div>
+
+  <!-- Recent Complaints -->
+  <div class="card mb-0" style="grid-column: span 2;">
+    <div class="card-header">
+      <h5>🛠️ Recent Complaints</h5>
+      <a href="/admin/complaints" class="btn btn-outline btn-sm">View All</a>
+    </div>
+    <div class="table-responsive">
+      <table class="tbl">
+        <thead><tr><th>Resident</th><th>Title</th><th>Priority</th><th>Status</th><th>Date</th></tr></thead>
+        <tbody>
+          <% if (recentComplaints.length === 0) { %>
+            <tr><td colspan="5" class="text-center" style="padding:30px; color:#aaa;">No complaints yet</td></tr>
+          <% } %>
+          <% recentComplaints.forEach(c => { %>
+          <tr>
+            <td><strong><%= c.user ? c.user.name : 'N/A' %></strong><br><small class="text-muted">Flat <%= c.flatNo %></small></td>
+            <td><%= c.title %></td>
+            <td><span class="priority-dot <%= c.priority %>"></span><%= c.priority %></td>
+            <td>
+              <% if(c.status==='Resolved') { %><span class="badge badge-resolved">✅ Resolved</span>
+              <% } else if(c.status==='In Progress') { %><span class="badge badge-progress">🔄 In Progress</span>
+              <% } else { %><span class="badge badge-pending">⏳ Pending</span><% } %>
+            </td>
+            <td class="text-muted text-sm"><%= new Date(c.createdAt).toLocaleDateString() %></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Payments -->
+<div class="card" style="margin-top:24px;">
+  <div class="card-header">
+    <h5>💳 Recent Payments</h5>
+    <a href="/admin/payments" class="btn btn-outline btn-sm">View All</a>
+  </div>
+  <div class="table-responsive">
+    <table class="tbl">
+      <thead><tr><th>Resident</th><th>Flat</th><th>Month</th><th>Amount</th><th>Date</th></tr></thead>
+      <tbody>
+        <% if (recentPayments.length === 0) { %>
+          <tr><td colspan="5" class="text-center" style="padding:30px; color:#aaa;">No payments yet</td></tr>
+        <% } %>
+        <% recentPayments.forEach(p => { %>
+        <tr>
+          <td><strong><%= p.user ? p.user.name : 'N/A' %></strong></td>
+          <td><%= p.flatNo %></td>
+          <td><%= p.month %> <%= p.year %></td>
+          <td><strong style="color:#27AE60;">₹<%= p.amount.toLocaleString() %></strong></td>
+          <td class="text-muted text-sm"><%= new Date(p.paidAt).toLocaleDateString() %></td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const labels = <%- chartLabels %>;
+const revenue = <%- chartRevenue %>;
+const complaintData = <%- complaintChart %>;
+const billData = <%- billChart %>;
+
+// Revenue Chart
+new Chart(document.getElementById('revenueChart'), {
+  type: 'bar',
+  data: {
+    labels,
+    datasets: [{
+      label: 'Revenue (₹)',
+      data: revenue,
+      backgroundColor: 'rgba(108,99,255,0.7)',
+      borderColor: '#6C63FF',
+      borderWidth: 2,
+      borderRadius: 8,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false } } }
+  }
+});
+
+// Complaint Doughnut
+new Chart(document.getElementById('complaintChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Resolved', 'Pending'],
+    datasets: [{ data: complaintData, backgroundColor: ['#2ECC71','#E74C3C'], borderWidth: 0 }]
+  },
+  options: { responsive: true, cutout: '70%', plugins: { legend: { position: 'bottom' } } }
+});
+
+// Bill Doughnut
+new Chart(document.getElementById('billChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Paid', 'Pending'],
+    datasets: [{ data: billData, backgroundColor: ['#3498DB','#F39C12'], borderWidth: 0 }]
+  },
+  options: { responsive: true, cutout: '70%', plugins: { legend: { position: 'bottom' } } }
+});
+</script>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,116 @@
+<%- include('../partials/header', { activePage: 'complaints' }) %>
+
+<div class="page-hero hero-complaints">
+  <div class="hero-content">
+    <h2>Complaints Management 📢</h2>
+    <p>Review and resolve resident complaints efficiently</p>
+  </div>
+  <div class="hero-icon">🛠️</div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h5>All Complaints</h5>
+  </div>
+  <div class="card-body" style="padding-bottom:0;">
+    <form action="/admin/complaints" method="GET" class="search-bar">
+      <select name="status" class="form-control" style="width:auto;">
+        <option value="">All Status</option>
+        <option value="Pending" <%= status==='Pending'?'selected':'' %>>⏳ Pending</option>
+        <option value="In Progress" <%= status==='In Progress'?'selected':'' %>>🔄 In Progress</option>
+        <option value="Resolved" <%= status==='Resolved'?'selected':'' %>>✅ Resolved</option>
+      </select>
+      <select name="priority" class="form-control" style="width:auto;">
+        <option value="">All Priority</option>
+        <option value="High" <%= priority==='High'?'selected':'' %>>🔴 High</option>
+        <option value="Medium" <%= priority==='Medium'?'selected':'' %>>🟡 Medium</option>
+        <option value="Low" <%= priority==='Low'?'selected':'' %>>🟢 Low</option>
+      </select>
+      <button type="submit" class="btn btn-primary">Filter</button>
+      <a href="/admin/complaints" class="btn btn-outline">Reset</a>
+    </form>
+  </div>
+
+  <% if (complaints.length === 0) { %>
+    <div class="empty-state"><div class="empty-icon">🎉</div><h5>No complaints found</h5><p>All clear!</p></div>
+  <% } else { %>
+  <div class="table-responsive">
+    <table class="tbl">
+      <thead>
+        <tr><th>Resident</th><th>Title</th><th>Category</th><th>Priority</th><th>Status</th><th>Date</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        <% complaints.forEach(c => { %>
+        <tr>
+          <td>
+            <strong><%= c.user ? c.user.name : 'N/A' %></strong><br>
+            <small class="text-muted">Flat <%= c.flatNo %></small>
+          </td>
+          <td>
+            <strong><%= c.title %></strong><br>
+            <small class="text-muted"><%= c.description.substring(0,50) %><%= c.description.length>50?'...':'' %></small>
+          </td>
+          <td><small><%= c.category %></small></td>
+          <td><span class="priority-dot <%= c.priority %>"></span><%= c.priority %></td>
+          <td>
+            <% if(c.status==='Resolved') { %><span class="badge badge-resolved">✅ Resolved</span>
+            <% } else if(c.status==='In Progress') { %><span class="badge badge-progress">🔄 In Progress</span>
+            <% } else { %><span class="badge badge-pending">⏳ Pending</span><% } %>
+          </td>
+          <td class="text-muted text-sm"><%= new Date(c.createdAt).toLocaleDateString() %></td>
+          <td>
+            <div class="d-flex gap-2" style="flex-wrap:wrap;">
+              <button class="btn btn-success btn-sm" onclick="openModal('<%= c._id %>', '<%= c.title.replace(/'/g, `\\'`) %>', '<%= c.status %>', '<%= (c.adminNote||'').replace(/'/g, `\\'`) %>')">✏️ Update</button>
+              <form action="/admin/complaints/<%= c._id %>?_method=DELETE" method="POST" style="display:inline;">
+                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this complaint?')">🗑️</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+</div>
+
+<!-- Update Modal -->
+<div id="updateModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:20px;padding:32px;width:100%;max-width:460px;margin:20px;">
+    <h4 style="margin-bottom:20px;color:#1A1A2E;">Update Complaint</h4>
+    <p id="modalTitle" style="font-size:13px;color:#888;margin-bottom:20px;"></p>
+    <form id="updateForm" method="POST">
+      <input type="hidden" name="_method" value="PUT">
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select name="status" id="modalStatus" class="form-control">
+          <option value="Pending">⏳ Pending</option>
+          <option value="In Progress">🔄 In Progress</option>
+          <option value="Resolved">✅ Resolved</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Admin Note</label>
+        <textarea name="adminNote" id="modalNote" class="form-control" placeholder="Optional note to resident..."></textarea>
+      </div>
+      <div class="d-flex gap-3" style="justify-content:flex-end;margin-top:8px;">
+        <button type="button" onclick="closeModal()" class="btn btn-outline">Cancel</button>
+        <button type="submit" class="btn btn-primary">✅ Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openModal(id, title, status, note) {
+  document.getElementById('updateForm').action = `/admin/complaints/${id}?_method=PUT`;
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalStatus').value = status;
+  document.getElementById('modalNote').value = note;
+  document.getElementById('updateModal').style.display = 'flex';
+}
+function closeModal() { document.getElementById('updateModal').style.display = 'none'; }
+document.getElementById('updateModal').addEventListener('click', function(e) { if(e.target===this) closeModal(); });
+</script>
+
+<%- include('../partials/footer') %>

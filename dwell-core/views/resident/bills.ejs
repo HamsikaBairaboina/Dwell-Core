@@ -1,0 +1,89 @@
+<%- include('../partials/header', { activePage: 'bills' }) %>
+
+<div class="page-hero hero-bills">
+  <div class="hero-content">
+    <h2>My Bills 💡</h2>
+    <p>View and pay your maintenance bills</p>
+  </div>
+  <div class="hero-icon">💰</div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h5>My Bills</h5>
+    <div class="d-flex gap-2">
+      <form action="/bills" method="GET" style="display:flex;gap:8px;">
+        <select name="status" class="form-control" style="width:auto;" onchange="this.form.submit()">
+          <option value="">All Bills</option>
+          <option value="Pending" <%= status==='Pending'?'selected':'' %>>⏳ Pending</option>
+          <option value="Paid" <%= status==='Paid'?'selected':'' %>>✅ Paid</option>
+        </select>
+      </form>
+    </div>
+  </div>
+
+  <% if (bills.length === 0) { %>
+    <div class="empty-state">
+      <div class="empty-icon">🎉</div>
+      <h5>No bills found</h5>
+      <p>You have no bills in this category.</p>
+    </div>
+  <% } else { %>
+  <div style="padding:20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;">
+    <% bills.forEach(b => { %>
+    <div style="background:#fff;border-radius:16px;border:1.5px solid <%= b.status==='Paid' ? '#d4edda' : '#ffeeba' %>;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.06);">
+      <div style="background:linear-gradient(135deg,<%= b.status==='Paid' ? '#2ECC71,#27AE60' : '#F39C12,#E67E22' %>);padding:16px 20px;color:#fff;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:16px;font-weight:700;"><%= b.month %> <%= b.year %></div>
+            <div style="font-size:12px;opacity:0.85;">Flat <%= b.flatNo %></div>
+          </div>
+          <div style="font-size:26px;font-weight:800;">₹<%= b.totalAmount.toLocaleString() %></div>
+        </div>
+      </div>
+      <div style="padding:16px 20px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;">
+          <div style="text-align:center;padding:10px;background:#f8f8ff;border-radius:10px;">
+            <div style="font-size:10px;color:#888;font-weight:600;text-transform:uppercase;">Maintenance</div>
+            <div style="font-size:14px;font-weight:700;color:#1A1A2E;">₹<%= b.maintenance.toLocaleString() %></div>
+          </div>
+          <div style="text-align:center;padding:10px;background:#f0f8ff;border-radius:10px;">
+            <div style="font-size:10px;color:#888;font-weight:600;text-transform:uppercase;">Water</div>
+            <div style="font-size:14px;font-weight:700;color:#3498DB;">₹<%= b.water.toLocaleString() %></div>
+          </div>
+          <div style="text-align:center;padding:10px;background:#fffbf0;border-radius:10px;">
+            <div style="font-size:10px;color:#888;font-weight:600;text-transform:uppercase;">Power</div>
+            <div style="font-size:14px;font-weight:700;color:#F39C12;">₹<%= b.power.toLocaleString() %></div>
+          </div>
+        </div>
+        <% if(b.status === 'Paid') { %>
+          <div style="text-align:center;padding:10px;background:#d4edda;border-radius:10px;color:#27AE60;font-weight:600;font-size:13px;">
+            ✅ Paid on <%= new Date(b.paidAt).toLocaleDateString() %>
+          </div>
+        <% } else { %>
+          <div style="margin-bottom:10px;">
+            <% if(b.dueDate) { %>
+              <small style="color:<%= new Date(b.dueDate) < new Date() ? '#E74C3C' : '#888' %>;">
+                <%= new Date(b.dueDate) < new Date() ? '⚠️ Overdue!' : '📅 Due: ' %> <%= new Date(b.dueDate).toLocaleDateString() %>
+              </small>
+            <% } %>
+          </div>
+          <form action="/bills/<%= b._id %>/pay" method="POST">
+            <select name="method" class="form-control" style="margin-bottom:8px;font-size:13px;">
+              <option value="Online">💳 Online Payment</option>
+              <option value="Bank Transfer">🏦 Bank Transfer</option>
+              <option value="Cash">💵 Cash</option>
+            </select>
+            <button type="submit" class="btn btn-success w-100" style="justify-content:center;" onclick="return confirm('Pay ₹<%= b.totalAmount %> for <%= b.month %> <%= b.year %>?')">
+              💰 Pay Now — ₹<%= b.totalAmount.toLocaleString() %>
+            </button>
+          </form>
+        <% } %>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>

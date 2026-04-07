@@ -1,0 +1,44 @@
+<%- include('../partials/header', { activePage: 'payments' }) %>
+
+<div class="page-hero hero-payments">
+  <div class="hero-content">
+    <h2>Payment Records ✅</h2>
+    <p>Track all resident payments — Total Collected: <strong>₹<%= total.toLocaleString() %></strong></p>
+  </div>
+  <div class="hero-icon">💳</div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h5>All Payments (<%= payments.length %>)</h5>
+    <span style="color:#27AE60;font-weight:700;font-size:15px;">₹<%= total.toLocaleString() %> Total</span>
+  </div>
+
+  <% if (payments.length === 0) { %>
+    <div class="empty-state"><div class="empty-icon">💳</div><h5>No payments yet</h5></div>
+  <% } else { %>
+  <div class="table-responsive">
+    <table class="tbl">
+      <thead>
+        <tr><th>#</th><th>Resident</th><th>Flat</th><th>Month/Year</th><th>Amount</th><th>Method</th><th>Transaction ID</th><th>Date</th></tr>
+      </thead>
+      <tbody>
+        <% payments.forEach((p, i) => { %>
+        <tr>
+          <td class="text-muted"><%= i+1 %></td>
+          <td><strong><%= p.user ? p.user.name : 'N/A' %></strong></td>
+          <td><span class="badge badge-general"><%= p.flatNo %></span></td>
+          <td><%= p.month %> <%= p.year %></td>
+          <td><strong style="color:#27AE60;">₹<%= p.amount.toLocaleString() %></strong></td>
+          <td><span class="badge badge-info"><%= p.method %></span></td>
+          <td class="text-muted text-sm"><%= p.transactionId %></td>
+          <td class="text-muted text-sm"><%= new Date(p.paidAt).toLocaleDateString() %></td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>

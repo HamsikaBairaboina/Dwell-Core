@@ -1,0 +1,44 @@
+<%- include('../partials/header', { activePage: 'notices' }) %>
+
+<div class="page-hero hero-notices">
+  <div class="hero-content">
+    <h2>Notice Board 📋</h2>
+    <p>Post announcements and important notices for residents</p>
+  </div>
+  <div class="hero-icon">📢</div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h5>All Notices (<%= notices.length %>)</h5>
+    <a href="/admin/notices/add" class="btn btn-primary btn-sm">+ Post Notice</a>
+  </div>
+  <div class="card-body">
+    <% if (notices.length === 0) { %>
+      <div class="empty-state"><div class="empty-icon">📋</div><h5>No notices posted yet</h5></div>
+    <% } else { %>
+      <% notices.forEach(n => { %>
+      <div class="notice-card <%= n.priority.toLowerCase() %>" style="position:relative;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+          <div>
+            <div class="notice-title"><%= n.title %></div>
+            <div class="notice-meta">
+              <span class="badge badge-<%= n.category.toLowerCase() %>"><%= n.category %></span>
+              &nbsp;•&nbsp;
+              <span class="badge badge-<%= n.priority.toLowerCase() %>"><%= n.priority %></span>
+              &nbsp;•&nbsp; By <%= n.author ? n.author.name : 'Admin' %>
+              &nbsp;•&nbsp; <%= new Date(n.createdAt).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) %>
+            </div>
+          </div>
+          <form action="/admin/notices/<%= n._id %>?_method=DELETE" method="POST">
+            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this notice?')">🗑️ Delete</button>
+          </form>
+        </div>
+        <div class="notice-body" style="margin-top:10px;"><%= n.content %></div>
+      </div>
+      <% }) %>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

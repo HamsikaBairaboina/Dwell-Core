@@ -1,0 +1,57 @@
+<%- include('./partials/header', { activePage: 'notifications' }) %>
+
+<div class="page-hero hero-notif">
+  <div class="hero-content">
+    <h2>Notifications 🔔</h2>
+    <p>Stay on top of all updates and alerts</p>
+  </div>
+  <div class="hero-icon">🔔</div>
+</div>
+
+<div class="card" style="max-width:720px;margin:0 auto;">
+  <div class="card-header">
+    <h5>All Notifications (<%= notifications.length %>)</h5>
+    <% if (notifications.length > 0) { %>
+    <form action="/notifications/clear" method="POST" style="display:inline;">
+      <button type="submit" class="btn btn-outline btn-sm" onclick="return confirm('Clear all notifications?')">🗑️ Clear All</button>
+    </form>
+    <% } %>
+  </div>
+  <div class="card-body">
+    <% if (notifications.length === 0) { %>
+      <div class="empty-state">
+        <div class="empty-icon">🔔</div>
+        <h5>No notifications</h5>
+        <p>You're all caught up! We'll notify you of any updates.</p>
+      </div>
+    <% } else { %>
+      <% notifications.forEach(n => { %>
+      <div class="notif-item <%= n.isRead ? '' : 'unread' %>">
+        <div class="notif-icon <%= n.type %>">
+          <% if(n.type==='complaint') { %>🛠️
+          <% } else if(n.type==='bill') { %>💰
+          <% } else if(n.type==='payment') { %>✅
+          <% } else if(n.type==='notice') { %>📢
+          <% } else { %>🔔<% } %>
+        </div>
+        <div class="notif-content" style="flex:1;">
+          <div class="notif-title">
+            <%= n.title %>
+            <% if(!n.isRead) { %><span style="display:inline-block;width:8px;height:8px;background:#6C63FF;border-radius:50%;margin-left:6px;vertical-align:middle;"></span><% } %>
+          </div>
+          <div class="notif-msg"><%= n.message %></div>
+          <div class="notif-time">
+            🕐 <%= new Date(n.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) %>
+            at <%= new Date(n.createdAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) %>
+          </div>
+        </div>
+        <% if(n.link) { %>
+        <a href="<%= n.link %>" class="btn btn-outline btn-sm" style="flex-shrink:0;align-self:center;">View →</a>
+        <% } %>
+      </div>
+      <% }) %>
+    <% } %>
+  </div>
+</div>
+
+<%- include('./partials/footer') %>

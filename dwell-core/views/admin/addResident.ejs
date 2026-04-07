@@ -1,0 +1,60 @@
+<%- include('../partials/header', { activePage: 'residents' }) %>
+
+<div class="page-hero hero-residents">
+  <div class="hero-content">
+    <h2>Add New Resident 🏠</h2>
+    <p>Fill in the details to register a new resident</p>
+  </div>
+  <div class="hero-icon">➕</div>
+</div>
+
+<div class="card" style="max-width:700px; margin:0 auto;">
+  <div class="card-header">
+    <h5>Resident Information</h5>
+    <a href="/admin/residents" class="btn btn-outline btn-sm">← Back</a>
+  </div>
+  <div class="card-body">
+    <form action="/admin/residents/add" method="POST">
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label">Full Name *</label>
+          <input type="text" name="name" class="form-control" placeholder="John Doe" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address *</label>
+          <input type="email" name="email" class="form-control" placeholder="john@example.com" required>
+        </div>
+      </div>
+      <div class="form-grid-3">
+        <div class="form-group">
+          <label class="form-label">Flat Number *</label>
+          <input type="text" name="flatNo" class="form-control" placeholder="A-101" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Floor</label>
+          <input type="text" name="floor" class="form-control" placeholder="1st Floor">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Family Members</label>
+          <input type="number" name="familyMembers" class="form-control" value="1" min="1">
+        </div>
+      </div>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input type="tel" name="phone" class="form-control" placeholder="+91 9876543210">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password *</label>
+          <input type="password" name="password" class="form-control" placeholder="Min 6 characters" required minlength="6">
+        </div>
+      </div>
+      <div class="d-flex gap-3" style="justify-content:flex-end; margin-top:8px;">
+        <a href="/admin/residents" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary">✅ Add Resident</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

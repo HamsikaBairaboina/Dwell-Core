@@ -1,0 +1,55 @@
+<%- include('../partials/header', { activePage: 'payments' }) %>
+
+<div class="page-hero hero-payments">
+  <div class="hero-content">
+    <h2>Payment History 💳</h2>
+    <p>All your past payments in one place</p>
+  </div>
+  <div class="hero-icon">✅</div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h5>Transaction History (<%= payments.length %>)</h5>
+    <% const totalPaid = payments.reduce((s,p) => s+p.amount, 0); %>
+    <span style="color:#27AE60;font-weight:700;">Total Paid: ₹<%= totalPaid.toLocaleString() %></span>
+  </div>
+
+  <% if (payments.length === 0) { %>
+    <div class="empty-state">
+      <div class="empty-icon">💳</div>
+      <h5>No payment history</h5>
+      <p>You haven't made any payments yet.</p>
+    </div>
+  <% } else { %>
+  <div class="table-responsive">
+    <table class="tbl">
+      <thead>
+        <tr><th>#</th><th>Month/Year</th><th>Amount</th><th>Method</th><th>Transaction ID</th><th>Date & Time</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <% payments.forEach((p, i) => { %>
+        <tr>
+          <td class="text-muted"><%= i+1 %></td>
+          <td><strong><%= p.month %> <%= p.year %></strong><br><small class="text-muted">Flat <%= p.flatNo %></small></td>
+          <td><strong style="color:#27AE60;font-size:15px;">₹<%= p.amount.toLocaleString() %></strong></td>
+          <td>
+            <% if(p.method==='Online') { %><span class="badge badge-info">💳 Online</span>
+            <% } else if(p.method==='Bank Transfer') { %><span class="badge badge-general">🏦 Bank Transfer</span>
+            <% } else { %><span class="badge badge-normal">💵 Cash</span><% } %>
+          </td>
+          <td style="font-family:monospace;font-size:12px;color:#6C63FF;"><%= p.transactionId %></td>
+          <td class="text-muted text-sm">
+            <%= new Date(p.paidAt).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'}) %><br>
+            <small><%= new Date(p.paidAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) %></small>
+          </td>
+          <td><span class="badge badge-paid">✅ Paid</span></td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>

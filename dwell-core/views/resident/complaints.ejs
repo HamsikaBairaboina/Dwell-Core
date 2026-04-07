@@ -1,0 +1,72 @@
+<%- include('../partials/header', { activePage: 'complaints' }) %>
+
+<div class="page-hero hero-complaints">
+  <div class="hero-content">
+    <h2>My Complaints 🛠️</h2>
+    <p>Track the status of your raised complaints</p>
+  </div>
+  <div class="hero-icon">📢</div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h5>My Complaints (<%= complaints.length %>)</h5>
+    <a href="/complaints/new" class="btn btn-primary btn-sm">+ New Complaint</a>
+  </div>
+
+  <% if (complaints.length === 0) { %>
+    <div class="empty-state">
+      <div class="empty-icon">🎉</div>
+      <h5>No complaints raised</h5>
+      <p>Everything seems to be working fine in your flat!</p>
+      <a href="/complaints/new" class="btn btn-primary" style="margin-top:16px;">Raise a Complaint</a>
+    </div>
+  <% } else { %>
+  <div class="table-responsive">
+    <table class="tbl">
+      <thead>
+        <tr><th>Title</th><th>Category</th><th>Priority</th><th>Status</th><th>Admin Note</th><th>Date</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        <% complaints.forEach(c => { %>
+        <tr>
+          <td>
+            <strong><%= c.title %></strong><br>
+            <small class="text-muted"><%= c.description.substring(0,60) %><%= c.description.length>60?'...':'' %></small>
+          </td>
+          <td><small><%= c.category %></small></td>
+          <td>
+            <span class="priority-dot <%= c.priority %>"></span><%= c.priority %>
+          </td>
+          <td>
+            <% if(c.status==='Resolved') { %><span class="badge badge-resolved">✅ Resolved</span>
+            <% } else if(c.status==='In Progress') { %><span class="badge badge-progress">🔄 In Progress</span>
+            <% } else { %><span class="badge badge-pending">⏳ Pending</span><% } %>
+          </td>
+          <td>
+            <% if(c.adminNote) { %>
+              <small style="color:#6C63FF;font-style:italic;">"<%= c.adminNote %>"</small>
+            <% } else { %>
+              <small class="text-muted">—</small>
+            <% } %>
+          </td>
+          <td class="text-muted text-sm">
+            <%= new Date(c.createdAt).toLocaleDateString() %><br>
+            <small><%= new Date(c.createdAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) %></small>
+          </td>
+          <td>
+            <% if(c.status === 'Pending') { %>
+            <form action="/complaints/<%= c._id %>?_method=DELETE" method="POST" style="display:inline;">
+              <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete" onclick="return confirm('Delete this complaint?')">🗑️</button>
+            </form>
+            <% } %>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>
